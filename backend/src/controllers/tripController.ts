@@ -122,7 +122,10 @@ export const regenerateTripDay = asyncHandler(async (req, res) => {
     instruction: input.instruction
   });
 
-  trip.itinerary = trip.itinerary.map((dayPlan) => (dayPlan.day === input.day ? updatedDay : dayPlan));
+  const dayIndex = trip.itinerary.findIndex((dayPlan) => dayPlan.day === input.day);
+  if (dayIndex === -1) throw new ApiError(404, "Day not found in itinerary");
+
+  trip.set(`itinerary.${dayIndex}`, updatedDay);
   await trip.save();
 
   res.json({ trip });
